@@ -1,0 +1,65 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id Int @id@default(autoincrement())
+  address String @unique
+  task Task[]
+}
+
+model Task {
+  id Int @id@default(autoincrement())
+  title String
+  description String?
+  options Option[]
+  done Boolean @default(false)
+  userId Int
+  user User @relation(fields: [userId],references: [id])
+  submissions Submission[]
+}
+
+model Option{
+  id Int @id@default(autoincrement())
+  imageUrl String
+  optionId Int
+  taskId Int
+  task Task @relation(fields: [taskId],references: [id])
+  submissions Submission[]
+}
+
+model Worker {
+  id Int @id@default(autoincrement())
+  address String @unique
+  submission Submission[]
+  balance Balance?
+}
+
+model Balance {
+  id Int @id@default(autoincrement())
+  pending_amount String
+  locked_amount String
+  workerId Int @unique
+  worker Worker @relation(fields: [workerId],references: [id])
+}
+
+model Submission {
+  id Int @id@default(autoincrement())
+  taskId Int
+  task Task @relation(fields: [taskId],references: [id])
+  workerId Int
+  worker Worker @relation(fields: [workerId],references: [id])
+  optionId Int
+  option Option @relation(fields: [optionId],references: [id])
+  date DateTime @default(now())
+}
