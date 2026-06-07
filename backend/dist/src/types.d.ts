@@ -13,5 +13,6 @@ export declare const taskBody: z.ZodObject<{
         optionId: z.ZodNumber;
         imageUrl: z.ZodString;
     }, z.z.core.$strip>>;
+    signature: z.ZodString;
 }, z.z.core.$strip>;
 //# sourceMappingURL=types.d.ts.map

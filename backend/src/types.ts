@@ -15,5 +15,6 @@ export const taskBody = z.object({
     options : z.object({
         optionId : z.number(),
         imageUrl : z.string()
-    }).array()
+    }).array(),
+    signature : z.string()
 }) 

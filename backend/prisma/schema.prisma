@@ -47,8 +47,8 @@ model Worker {
 
 model Balance {
   id Int @id@default(autoincrement())
-  pending_amount String
-  locked_amount String
+  pending_amount Int
+  locked_amount Int
   workerId Int @unique
   worker Worker @relation(fields: [workerId],references: [id])
 }

@@ -1,118 +1,213 @@
-"use client"
-import { useConnection, useWallet } from "@solana/wallet-adapter-react"
-import { LAMPORTS_PER_SOL, PublicKey , SystemProgram, Transaction } from "@solana/web3.js"
-import axios from "axios"
-import { useEffect, useState } from "react"
+"use client";
+import { useConnection, useWallet } from "@solana/wallet-adapter-react";
+import {
+  LAMPORTS_PER_SOL,
+  PublicKey,
+  SystemProgram,
+  Transaction,
+} from "@solana/web3.js";
+import axios from "axios";
+import { useCallback, useEffect, useState } from "react";
 
 interface imageType {
-    imageUrl : string,
-    optionId : number
+  imageUrl: string;
+  optionId: number;
 }
 
-export function Upload({publicKey} : {publicKey : string}){
-    const wallet = useWallet()
-    const { connection } = useConnection()
+export function Upload({ publicKey }: { publicKey: string }) {
+  const wallet = useWallet();
+  const { connection } = useConnection();
+  const [selected, setSelected] = useState<Uint8Array>();
+  const [images, setImages] = useState<imageType[]>([]);
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [payment, setPayment] = useState<string>();
+  const [count, setCount] = useState(1);
+  const [token, setToken] = useState<string | null>(null);
 
-    const token = localStorage.getItem('token') || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTc3NzU3MzE0NH0.6Sol4RSdV4GatV4MOa9xxdoPHaIxNppXx-yafgKiOLw"
-    const [selected,setSelected] = useState<Uint8Array>()
-    const [images,setImages] = useState<imageType[]>([])
-    const [title,setTitle] = useState("")
-    const [description,setDescription] = useState("")
-    const [payment,setPayment] = useState<string>()
-    const [count,setCount] = useState(1)
+  useEffect(() => {
+    const t = localStorage.getItem("token");
+    console.log(connection.rpcEndpoint)
+    setToken(t);
+  }, []);
 
-    useEffect(()=>{
-        if(!selected) return
-        async function uploadImage(){
-            const res = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/getSignedUrl`,{
-                headers : {
-                    'authorization' : `Bearer ${token}`
-                }
-            })
-            const url = res.data.url
-            const response = await axios.put(url,selected,{
-                headers : {
-                    'Content-Type' : 'image/png'
-                }
-            })            
-            console.log(response)
+  useEffect(() => {
+    if (!selected) return;
+    async function uploadImage() {
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/getSignedUrl`,
+        {
+          headers: {
+            authorization: `Bearer ${token}`,
+          },
+        },
+      );
+      const url = res.data.url;
+      const response = await axios.put(url, selected, {
+        headers: {
+          "Content-Type": "image/png",
+        },
+      });
 
-            setImages(prev=>[...prev,{
-                imageUrl : `${process.env.NEXT_PUBLIC_CLOUDFRONT_URL}/${res.data.key}`,
-                optionId : count
-            }])
-            setCount(count+1)
-        }
-        uploadImage()
-    },[selected])
+      setImages((prev) => [
+        ...prev,
+        {
+          imageUrl: `${process.env.NEXT_PUBLIC_CLOUDFRONT_URL}/${res.data.key}`,
+          optionId: count,
+        },
+      ]);
+      setCount(count + 1);
+    }
+    uploadImage();
+  }, [selected]);
 
-    async function handlePayment(){
-        if(!title || !description || images.length===0){
-            alert('please fill all the fields first')
-            return
+  const handlePayment = useCallback(async ()=> {
+        console.log({title,description,images})
+        if (!title || !description || images.length === 0) {
+        alert("please fill all the fields first");
+        return;
         }
         const transaction = new Transaction().add(
-            SystemProgram.transfer({
-                fromPubkey: new PublicKey(publicKey),
-                toPubkey: new PublicKey(process.env.NEXT_PUBLIC_PARENT_WALLET || ''),
-                lamports : 0.1*LAMPORTS_PER_SOL,
-            })
+        SystemProgram.transfer({
+            fromPubkey: new PublicKey(publicKey),
+            toPubkey: new PublicKey(process.env.NEXT_PUBLIC_PARENT_WALLET || ""),
+            lamports: 0.1 * LAMPORTS_PER_SOL,
+        }),
         );
-        let blockhash = (await connection.getLatestBlockhash("finalized")).blockhash;
-        transaction.recentBlockhash = blockhash
-        transaction.feePayer = new PublicKey(publicKey)
+        const { context: { slot: minContextSlot }, value: { blockhash, lastValidBlockHeight }} = await connection.getLatestBlockhashAndContext();
+        
+        transaction.recentBlockhash = blockhash;
+        transaction.feePayer = new PublicKey(publicKey);
+        
+        const signature = await wallet.sendTransaction(transaction, connection, { minContextSlot });
 
-        console.log(connection)
-        console.log(wallet)
-
-        const signature = await wallet.sendTransaction(transaction,connection)
         setPayment(signature)
-        console.log(signature)
-    }
+    },[publicKey,connection,wallet,title,description,images])
 
-    async function handleSubmit(){
-        if(!images){
-            alert('please provide options first')
-            return
-        }
-        if(!payment){
-            alert('please pay first')
-            return
-        }
-        const res = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/task`,{
-            title,
-            description,
-            options : images
-        },{
-            headers : {
-                'authorization' : `Bearer ${token}`
-            }
-        }) 
-        console.log(res.data)
+  async function handleSubmit() {
+    if (!images) {
+      alert("please provide options first");
+      return;
     }
-    
-    return(
-        <div>
-            <input type="text" onChange={e=>setTitle(e.target.value)} placeholder="Title"/>
-            <input type="text" onChange={e=>setDescription(e.target.value)} placeholder="Description" />
-            <input type="file" onChange={(e)=>{
-                const file = e.target.files?.[0];
-                if (file) {
-                const reader = new FileReader();
-                
-                reader.onload = (e) => {
-                    const arrayBuffer = e.target?.result as ArrayBuffer
-                    const uint8Array = new Uint8Array(arrayBuffer);
-                    console.log("Binary Data:", uint8Array);
-                    setSelected(uint8Array);
-                };
-                
-                reader.readAsArrayBuffer(file);
-            }}}/>
-            {images ? images.map(image=>(
-                <img key={image.optionId} src = {image.imageUrl} width={500} height={500} />
-            )) : <></>}
-            {payment ? <button onClick={handleSubmit}>Submit</button>  : <button onClick={handlePayment}>Make payment</button>}
+    if (!payment) {
+      alert("please pay first");
+      return;
+    }
+    const res = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/task`,{
+        title,
+        description,
+        options: images,
+        signature : payment
+      },{
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      },
+    );
+  }
+
+  return (
+    <div className = "bg-[#111827]/60 backdrop-blur-md border border-white/10 rounded-2xl p-6 shadow-xl">
+      <div className="min-h-screen bg-[#050816] flex justify-center items-center p-6">
+        <div className="w-full max-w-2xl bg-[#0A1022] border border-violet-500/20 rounded-2xl p-8 shadow-xl">
+
+          <h1 className="text-3xl font-bold text-white mb-2">
+            Create Task
+          </h1>
+
+          <p className="text-gray-400 mb-8">
+            Upload your content and collect opinions from real people.
+          </p>
+
+          <div className="space-y-5">
+
+            <input
+              type="text"
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Title"
+              className="w-full bg-[#111827] text-white px-4 py-3 rounded-xl border border-violet-500/20 focus:outline-none focus:border-violet-500 placeholder:text-gray-500"
+            />
+
+            <input
+              type="text"
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Description"
+              className="w-full bg-[#111827] text-white px-4 py-3 rounded-xl border border-violet-500/20 focus:outline-none focus:border-violet-500 placeholder:text-gray-500"
+            />
+
+            <label className="block">
+              <div className="border-2 border-dashed border-violet-500/30 bg-[#111827] rounded-xl p-8 text-center cursor-pointer hover:border-violet-500 transition">
+                <p className="text-violet-400 text-lg font-medium">
+                  Upload Image
+                </p>
+                <p className="text-gray-500 text-sm mt-1">
+                  Click to choose a file
+                </p>
+              </div>
+
+              <input
+                type="file"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+
+                  if (file) {
+                    const reader = new FileReader();
+
+                    reader.onload = (e) => {
+                      const arrayBuffer =
+                        e.target?.result as ArrayBuffer;
+
+                      const uint8Array =
+                        new Uint8Array(arrayBuffer);
+
+                      setSelected(uint8Array);
+                    };
+
+                    reader.readAsArrayBuffer(file);
+                  }
+                }}
+              />
+            </label>
+
+            {images && images.length > 0 && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+                {images.map((image) => (
+                  <div
+                    key={image.optionId}
+                    className="overflow-hidden rounded-xl border border-violet-500/20 bg-[#111827]"
+                  >
+                    <img
+                      src={image.imageUrl}
+                      className="w-full h-64 object-cover"
+                      alt=""
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div className="pt-4">
+              {payment ? (
+                <button
+                  onClick={handleSubmit}
+                  className="w-full bg-linear-to-r from-violet-600 to-purple-500 text-white py-3 rounded-xl font-semibold hover:opacity-90 transition"
+                >
+                  Submit Task
+                </button>
+              ) : (
+                <button
+                  onClick={handlePayment}
+                  className="w-full bg-linear-to-r from-cyan-500 to-violet-600 text-white py-3 rounded-xl font-semibold hover:opacity-90 transition"
+                >
+                  Make Payment
+                </button>
+              )}
+            </div>
+
+          </div>
         </div>
-    )
+      </div>
+    </div>
+  );
 }

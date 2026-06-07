@@ -14,22 +14,26 @@ export type AggregateBalance = {
 };
 export type BalanceAvgAggregateOutputType = {
     id: number | null;
+    pending_amount: number | null;
+    locked_amount: number | null;
     workerId: number | null;
 };
 export type BalanceSumAggregateOutputType = {
     id: number | null;
+    pending_amount: number | null;
+    locked_amount: number | null;
     workerId: number | null;
 };
 export type BalanceMinAggregateOutputType = {
     id: number | null;
-    pending_amount: string | null;
-    locked_amount: string | null;
+    pending_amount: number | null;
+    locked_amount: number | null;
     workerId: number | null;
 };
 export type BalanceMaxAggregateOutputType = {
     id: number | null;
-    pending_amount: string | null;
-    locked_amount: string | null;
+    pending_amount: number | null;
+    locked_amount: number | null;
     workerId: number | null;
 };
 export type BalanceCountAggregateOutputType = {
@@ -41,10 +45,14 @@ export type BalanceCountAggregateOutputType = {
 };
 export type BalanceAvgAggregateInputType = {
     id?: true;
+    pending_amount?: true;
+    locked_amount?: true;
     workerId?: true;
 };
 export type BalanceSumAggregateInputType = {
     id?: true;
+    pending_amount?: true;
+    locked_amount?: true;
     workerId?: true;
 };
 export type BalanceMinAggregateInputType = {
@@ -144,8 +152,8 @@ export type BalanceGroupByArgs<ExtArgs extends runtime.Types.Extensions.Internal
 };
 export type BalanceGroupByOutputType = {
     id: number;
-    pending_amount: string;
-    locked_amount: string;
+    pending_amount: number;
+    locked_amount: number;
     workerId: number;
     _count: BalanceCountAggregateOutputType | null;
     _avg: BalanceAvgAggregateOutputType | null;
@@ -161,8 +169,8 @@ export type BalanceWhereInput = {
     OR?: Prisma.BalanceWhereInput[];
     NOT?: Prisma.BalanceWhereInput | Prisma.BalanceWhereInput[];
     id?: Prisma.IntFilter<"Balance"> | number;
-    pending_amount?: Prisma.StringFilter<"Balance"> | string;
-    locked_amount?: Prisma.StringFilter<"Balance"> | string;
+    pending_amount?: Prisma.IntFilter<"Balance"> | number;
+    locked_amount?: Prisma.IntFilter<"Balance"> | number;
     workerId?: Prisma.IntFilter<"Balance"> | number;
     worker?: Prisma.XOR<Prisma.WorkerScalarRelationFilter, Prisma.WorkerWhereInput>;
 };
@@ -179,8 +187,8 @@ export type BalanceWhereUniqueInput = Prisma.AtLeast<{
     AND?: Prisma.BalanceWhereInput | Prisma.BalanceWhereInput[];
     OR?: Prisma.BalanceWhereInput[];
     NOT?: Prisma.BalanceWhereInput | Prisma.BalanceWhereInput[];
-    pending_amount?: Prisma.StringFilter<"Balance"> | string;
-    locked_amount?: Prisma.StringFilter<"Balance"> | string;
+    pending_amount?: Prisma.IntFilter<"Balance"> | number;
+    locked_amount?: Prisma.IntFilter<"Balance"> | number;
     worker?: Prisma.XOR<Prisma.WorkerScalarRelationFilter, Prisma.WorkerWhereInput>;
 }, "id" | "workerId">;
 export type BalanceOrderByWithAggregationInput = {
@@ -199,46 +207,46 @@ export type BalanceScalarWhereWithAggregatesInput = {
     OR?: Prisma.BalanceScalarWhereWithAggregatesInput[];
     NOT?: Prisma.BalanceScalarWhereWithAggregatesInput | Prisma.BalanceScalarWhereWithAggregatesInput[];
     id?: Prisma.IntWithAggregatesFilter<"Balance"> | number;
-    pending_amount?: Prisma.StringWithAggregatesFilter<"Balance"> | string;
-    locked_amount?: Prisma.StringWithAggregatesFilter<"Balance"> | string;
+    pending_amount?: Prisma.IntWithAggregatesFilter<"Balance"> | number;
+    locked_amount?: Prisma.IntWithAggregatesFilter<"Balance"> | number;
     workerId?: Prisma.IntWithAggregatesFilter<"Balance"> | number;
 };
 export type BalanceCreateInput = {
-    pending_amount: string;
-    locked_amount: string;
+    pending_amount: number;
+    locked_amount: number;
     worker: Prisma.WorkerCreateNestedOneWithoutBalanceInput;
 };
 export type BalanceUncheckedCreateInput = {
     id?: number;
-    pending_amount: string;
-    locked_amount: string;
+    pending_amount: number;
+    locked_amount: number;
     workerId: number;
 };
 export type BalanceUpdateInput = {
-    pending_amount?: Prisma.StringFieldUpdateOperationsInput | string;
-    locked_amount?: Prisma.StringFieldUpdateOperationsInput | string;
+    pending_amount?: Prisma.IntFieldUpdateOperationsInput | number;
+    locked_amount?: Prisma.IntFieldUpdateOperationsInput | number;
     worker?: Prisma.WorkerUpdateOneRequiredWithoutBalanceNestedInput;
 };
 export type BalanceUncheckedUpdateInput = {
     id?: Prisma.IntFieldUpdateOperationsInput | number;
-    pending_amount?: Prisma.StringFieldUpdateOperationsInput | string;
-    locked_amount?: Prisma.StringFieldUpdateOperationsInput | string;
+    pending_amount?: Prisma.IntFieldUpdateOperationsInput | number;
+    locked_amount?: Prisma.IntFieldUpdateOperationsInput | number;
     workerId?: Prisma.IntFieldUpdateOperationsInput | number;
 };
 export type BalanceCreateManyInput = {
     id?: number;
-    pending_amount: string;
-    locked_amount: string;
+    pending_amount: number;
+    locked_amount: number;
     workerId: number;
 };
 export type BalanceUpdateManyMutationInput = {
-    pending_amount?: Prisma.StringFieldUpdateOperationsInput | string;
-    locked_amount?: Prisma.StringFieldUpdateOperationsInput | string;
+    pending_amount?: Prisma.IntFieldUpdateOperationsInput | number;
+    locked_amount?: Prisma.IntFieldUpdateOperationsInput | number;
 };
 export type BalanceUncheckedUpdateManyInput = {
     id?: Prisma.IntFieldUpdateOperationsInput | number;
-    pending_amount?: Prisma.StringFieldUpdateOperationsInput | string;
-    locked_amount?: Prisma.StringFieldUpdateOperationsInput | string;
+    pending_amount?: Prisma.IntFieldUpdateOperationsInput | number;
+    locked_amount?: Prisma.IntFieldUpdateOperationsInput | number;
     workerId?: Prisma.IntFieldUpdateOperationsInput | number;
 };
 export type BalanceNullableScalarRelationFilter = {
@@ -253,6 +261,8 @@ export type BalanceCountOrderByAggregateInput = {
 };
 export type BalanceAvgOrderByAggregateInput = {
     id?: Prisma.SortOrder;
+    pending_amount?: Prisma.SortOrder;
+    locked_amount?: Prisma.SortOrder;
     workerId?: Prisma.SortOrder;
 };
 export type BalanceMaxOrderByAggregateInput = {
@@ -269,6 +279,8 @@ export type BalanceMinOrderByAggregateInput = {
 };
 export type BalanceSumOrderByAggregateInput = {
     id?: Prisma.SortOrder;
+    pending_amount?: Prisma.SortOrder;
+    locked_amount?: Prisma.SortOrder;
     workerId?: Prisma.SortOrder;
 };
 export type BalanceCreateNestedOneWithoutWorkerInput = {
@@ -300,13 +312,13 @@ export type BalanceUncheckedUpdateOneWithoutWorkerNestedInput = {
     update?: Prisma.XOR<Prisma.XOR<Prisma.BalanceUpdateToOneWithWhereWithoutWorkerInput, Prisma.BalanceUpdateWithoutWorkerInput>, Prisma.BalanceUncheckedUpdateWithoutWorkerInput>;
 };
 export type BalanceCreateWithoutWorkerInput = {
-    pending_amount: string;
-    locked_amount: string;
+    pending_amount: number;
+    locked_amount: number;
 };
 export type BalanceUncheckedCreateWithoutWorkerInput = {
     id?: number;
-    pending_amount: string;
-    locked_amount: string;
+    pending_amount: number;
+    locked_amount: number;
 };
 export type BalanceCreateOrConnectWithoutWorkerInput = {
     where: Prisma.BalanceWhereUniqueInput;
@@ -322,13 +334,13 @@ export type BalanceUpdateToOneWithWhereWithoutWorkerInput = {
     data: Prisma.XOR<Prisma.BalanceUpdateWithoutWorkerInput, Prisma.BalanceUncheckedUpdateWithoutWorkerInput>;
 };
 export type BalanceUpdateWithoutWorkerInput = {
-    pending_amount?: Prisma.StringFieldUpdateOperationsInput | string;
-    locked_amount?: Prisma.StringFieldUpdateOperationsInput | string;
+    pending_amount?: Prisma.IntFieldUpdateOperationsInput | number;
+    locked_amount?: Prisma.IntFieldUpdateOperationsInput | number;
 };
 export type BalanceUncheckedUpdateWithoutWorkerInput = {
     id?: Prisma.IntFieldUpdateOperationsInput | number;
-    pending_amount?: Prisma.StringFieldUpdateOperationsInput | string;
-    locked_amount?: Prisma.StringFieldUpdateOperationsInput | string;
+    pending_amount?: Prisma.IntFieldUpdateOperationsInput | number;
+    locked_amount?: Prisma.IntFieldUpdateOperationsInput | number;
 };
 export type BalanceSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
     id?: boolean;
@@ -374,8 +386,8 @@ export type $BalancePayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     };
     scalars: runtime.Types.Extensions.GetPayloadResult<{
         id: number;
-        pending_amount: string;
-        locked_amount: string;
+        pending_amount: number;
+        locked_amount: number;
         workerId: number;
     }, ExtArgs["result"]["balance"]>;
     composites: {};
@@ -733,8 +745,8 @@ export interface Prisma__BalanceClient<T, Null = never, ExtArgs extends runtime.
  */
 export interface BalanceFieldRefs {
     readonly id: Prisma.FieldRef<"Balance", 'Int'>;
-    readonly pending_amount: Prisma.FieldRef<"Balance", 'String'>;
-    readonly locked_amount: Prisma.FieldRef<"Balance", 'String'>;
+    readonly pending_amount: Prisma.FieldRef<"Balance", 'Int'>;
+    readonly locked_amount: Prisma.FieldRef<"Balance", 'Int'>;
     readonly workerId: Prisma.FieldRef<"Balance", 'Int'>;
 }
 /**
