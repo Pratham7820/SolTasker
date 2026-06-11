@@ -71,7 +71,7 @@ export function Upload({ publicKey }: { publicKey: string }) {
         SystemProgram.transfer({
             fromPubkey: new PublicKey(publicKey),
             toPubkey: new PublicKey(process.env.NEXT_PUBLIC_PARENT_WALLET || ""),
-            lamports: 0.1 * LAMPORTS_PER_SOL,
+            lamports: 1 * LAMPORTS_PER_SOL,
         }),
         );
         const { context: { slot: minContextSlot }, value: { blockhash, lastValidBlockHeight }} = await connection.getLatestBlockhashAndContext();
@@ -104,6 +104,15 @@ export function Upload({ publicKey }: { publicKey: string }) {
         },
       },
     );
+    if(!res){
+      alert('transaction failed')
+      return
+    }
+    setTitle('')
+    setDescription('')
+    setCount(1)
+    setImages([])
+    alert('Uploaded Successfully')
   }
 
   return (
@@ -123,6 +132,7 @@ export function Upload({ publicKey }: { publicKey: string }) {
 
             <input
               type="text"
+              defaultValue=""
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Title"
               className="w-full bg-[#111827] text-white px-4 py-3 rounded-xl border border-violet-500/20 focus:outline-none focus:border-violet-500 placeholder:text-gray-500"
@@ -130,6 +140,7 @@ export function Upload({ publicKey }: { publicKey: string }) {
 
             <input
               type="text"
+              defaultValue=""
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Description"
               className="w-full bg-[#111827] text-white px-4 py-3 rounded-xl border border-violet-500/20 focus:outline-none focus:border-violet-500 placeholder:text-gray-500"
@@ -200,7 +211,7 @@ export function Upload({ publicKey }: { publicKey: string }) {
                   onClick={handlePayment}
                   className="w-full bg-linear-to-r from-cyan-500 to-violet-600 text-white py-3 rounded-xl font-semibold hover:opacity-90 transition"
                 >
-                  Make Payment
+                  Make Payment of 1 SOL
                 </button>
               )}
             </div>
@@ -209,5 +220,5 @@ export function Upload({ publicKey }: { publicKey: string }) {
         </div>
       </div>
     </div>
-  );
+  )
 }

@@ -1,10 +1,16 @@
 "use client"
 import { useWallet } from "@solana/wallet-adapter-react";
-import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import bs58 from "bs58"
+import dynamic from "next/dynamic";
+
+const WalletMultiButton = dynamic(
+  () => import('@solana/wallet-adapter-react-ui').then(m => m.WalletMultiButton),
+  { ssr: false }
+)
+
 
 export function Appbar(){
     const router = useRouter()

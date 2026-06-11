@@ -10,6 +10,7 @@ import nacl from "tweetnacl";
 import { PublicKey } from "@solana/web3.js";
 import bs58 from "bs58";
 import { connection } from "./index.js";
+import { map } from "zod";
 const userRouter = express.Router();
 const client = new S3Client({
     credentials: {
@@ -114,20 +115,45 @@ userRouter.post('/task', userMiddleware, async (req, res) => {
         response
     });
 });
-userRouter.get('/allSubmissions', userMiddleware, async (req, res) => {
+userRouter.get('/task/:taskId', userMiddleware, async (req, res) => {
     const userId = req.userId;
-    const { taskId } = req.body;
+    const taskId = req.params.taskId;
     if (!taskId) {
         return res.json({
             message: 'taskId not provided'
         });
     }
+    const task = await prisma.task.findFirst({
+        where: {
+            id: Number(taskId),
+            userId: Number(userId)
+        },
+        include: {
+            options: true
+        }
+    });
+    if (!task) {
+        return res.json({
+            message: 'no task exist as such'
+        });
+    }
     const submissions = await prisma.submission.findMany({
         where: {
             taskId: Number(taskId)
+        },
+        include: { option: true }
+    });
+    const cnt = new Map();
+    submissions.forEach((sub) => {
+        if (!cnt.has(sub.option.optionId)) {
+            cnt.set(sub.option.optionId, 1);
+        }
+        else {
+            cnt.set(sub.option.optionId, cnt.get(sub.option.optionId) + 1);
         }
     });
-    res.json({ submissions });
+    const votes = Object.fromEntries(cnt);
+    res.json({ task, votes });
 });
 userRouter.get('/allTask', userMiddleware, async (req, res) => {
     const userId = req.userId;
