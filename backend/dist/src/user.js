@@ -71,49 +71,51 @@ userRouter.post('/task', userMiddleware, async (req, res) => {
     const userId = req.userId;
     const parseBody = taskBody.safeParse(req.body);
     if (parseBody.error) {
-        console.log(error);
-        return res.json({
-            message: 'input field not valid'
-        });
+        console.log(parseBody.error);
+        return res.status(400).json({ message: 'input field not valid' });
     }
     const { title, description, options, signature } = parseBody.data;
-    let txn = null;
-    for (let i = 0; i < 8; i++) {
-        txn = await connection.getParsedTransaction(signature, {
-            maxSupportedTransactionVersion: 1,
-            commitment: "confirmed",
-        });
-        if (txn)
-            break;
-        await new Promise(res => setTimeout(res, 1000));
-    }
-    if (!txn) {
-        return res.status(400).json({
-            message: "Transaction not found after retries"
-        });
-    }
-    const response = await prisma.$transaction(async (tx) => {
-        const task = await tx.task.create({
-            data: {
-                title,
-                description,
-                userId: Number(userId)
-            }
-        });
-        for (const option of options) {
-            await tx.option.create({
+    try {
+        // Solana tx check
+        let txn = null;
+        for (let i = 0; i < 8; i++) {
+            txn = await connection.getParsedTransaction(signature, {
+                maxSupportedTransactionVersion: 1,
+                commitment: "confirmed",
+            });
+            if (txn)
+                break;
+            await new Promise(res => setTimeout(res, 1000));
+        }
+        if (!txn) {
+            return res.status(400).json({ message: "Transaction not found after retries" });
+        }
+        // Prisma transaction
+        const response = await prisma.$transaction(async (tx) => {
+            const task = await tx.task.create({
                 data: {
-                    optionId: option.optionId,
-                    imageUrl: option.imageUrl,
-                    taskId: task.id
+                    title,
+                    description,
+                    userId: Number(userId)
                 }
             });
-        }
-        return task;
-    });
-    res.json({
-        response
-    });
+            for (const option of options) {
+                await tx.option.create({
+                    data: {
+                        optionId: option.optionId,
+                        imageUrl: option.imageUrl,
+                        taskId: task.id
+                    }
+                });
+            }
+            return task;
+        });
+        res.json({ response });
+    }
+    catch (err) {
+        console.error('[TASK CREATE ERROR]', err);
+        res.status(500).json({ message: 'Something went wrong', error: err });
+    }
 });
 userRouter.get('/task/:taskId', userMiddleware, async (req, res) => {
     const userId = req.userId;

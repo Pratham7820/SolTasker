@@ -21,7 +21,7 @@ export function Appbar(){
     },[publicKey])
     
     async function handleSignIn(){
-            const message = "this is sign in message for user";
+            const message = "this is sign in message for worker";
             const messageBytes = new TextEncoder().encode(message)
             if(!signMessage){
                 alert('signing message is not supported')

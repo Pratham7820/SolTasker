@@ -21,10 +21,8 @@ workerRouter.post('/login', async (req, res) => {
             message: 'signature not provided'
         });
     }
-    console.log(signature);
     const sign = bs58.decode(signature);
     const verify = nacl.sign.detached.verify(msg, sign, new PublicKey(address).toBytes());
-    console.log(verify);
     if (!verify) {
         return res.json({
             message: 'authentication failed'
@@ -85,7 +83,7 @@ workerRouter.post('/submission', workerMiddleware, async (req, res) => {
             where: { workerId: Number(workerId) },
             data: {
                 pending_amount: {
-                    increment: 0.01
+                    increment: 0.01 * Number(process.env.DECIMAL_POINT || 100)
                 }
             }
         });
@@ -93,6 +91,17 @@ workerRouter.post('/submission', workerMiddleware, async (req, res) => {
     }
     res.json({
         message: 'submission failed'
+    });
+});
+workerRouter.get("/balance", workerMiddleware, async (req, res) => {
+    const workerId = req.workerId;
+    const balance = await prisma.balance.findFirst({
+        where: {
+            workerId: Number(workerId)
+        }
+    });
+    return res.json({
+        balance: (balance?.pending_amount || 0) / Number(process.env.DECIMAL_POINT)
     });
 });
 workerRouter.get("/getPayment", workerMiddleware, async (req, res) => {
@@ -110,15 +119,13 @@ workerRouter.get("/getPayment", workerMiddleware, async (req, res) => {
             });
         }
         const amount = worker.balance.pending_amount;
-        if (!amount || amount < 0.1) {
+        if (!amount || amount < 0.1 * Number(process.env.DECIMAL_POINT || 100)) {
             return res.json({
                 message: "not enough funds to withdraw",
             });
         }
         await prisma.balance.update({
-            where: {
-                workerId,
-            },
+            where: { workerId },
             data: {
                 locked_amount: amount,
                 pending_amount: 0,
@@ -128,12 +135,11 @@ workerRouter.get("/getPayment", workerMiddleware, async (req, res) => {
             const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash();
             const transaction = new Transaction({
                 feePayer: new PublicKey(process.env.PARENT_WALLET_ADDRESS || ""),
-                blockhash,
-                lastValidBlockHeight
+                blockhash, lastValidBlockHeight
             }).add(SystemProgram.transfer({
                 fromPubkey: new PublicKey(process.env.PARENT_WALLET_ADDRESS || ""),
                 toPubkey: new PublicKey(worker.address),
-                lamports: amount * LAMPORTS_PER_SOL,
+                lamports: amount / Number(process.env.DECIMAL_POINT || 100) * LAMPORTS_PER_SOL,
             }));
             const sender = Keypair.fromSecretKey(bs58.decode(process.env.PARENT_SECRET_ADDRESS || ""));
             const signature = await connection.sendTransaction(transaction, [sender]);
