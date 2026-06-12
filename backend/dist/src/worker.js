@@ -118,19 +118,20 @@ workerRouter.get("/getPayment", workerMiddleware, async (req, res) => {
                 message: "worker not found",
             });
         }
-        const amount = worker.balance.pending_amount;
-        if (!amount || amount < 0.1 * Number(process.env.DECIMAL_POINT || 100)) {
+        const threshold = 0.1 * Number(process.env.DECIMAL_POINT || 100);
+        const claimed = await prisma.$queryRaw `
+        UPDATE "Balance"
+        SET locked_amount = pending_amount,
+            pending_amount = 0
+        WHERE "workerId" = ${workerId}
+        AND pending_amount >= ${threshold}
+        RETURNING locked_amount AS amount`;
+        if (claimed.length === 0) {
             return res.json({
                 message: "not enough funds to withdraw",
             });
         }
-        await prisma.balance.update({
-            where: { workerId },
-            data: {
-                locked_amount: amount,
-                pending_amount: 0,
-            },
-        });
+        const amount = claimed[0]?.amount;
         try {
             const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash();
             const transaction = new Transaction({
@@ -139,7 +140,7 @@ workerRouter.get("/getPayment", workerMiddleware, async (req, res) => {
             }).add(SystemProgram.transfer({
                 fromPubkey: new PublicKey(process.env.PARENT_WALLET_ADDRESS || ""),
                 toPubkey: new PublicKey(worker.address),
-                lamports: amount / Number(process.env.DECIMAL_POINT || 100) * LAMPORTS_PER_SOL,
+                lamports: (amount || 0) / Number(process.env.DECIMAL_POINT || 100) * LAMPORTS_PER_SOL,
             }));
             const sender = Keypair.fromSecretKey(bs58.decode(process.env.PARENT_SECRET_ADDRESS || ""));
             const signature = await connection.sendTransaction(transaction, [sender]);
@@ -181,7 +182,7 @@ workerRouter.get("/getPayment", workerMiddleware, async (req, res) => {
                 },
                 data: {
                     locked_amount: 0,
-                    pending_amount: amount,
+                    pending_amount: amount || 0,
                 },
             });
             return res.status(500).json({
