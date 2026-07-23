@@ -4,7 +4,7 @@ import workerRouter from "./worker.js"
 import cors from "cors"
 import { Connection } from "@solana/web3.js"
 import { PORT, SOLANA_RPC_URL } from "./config.js"
-
+import "dotenv/config"
 
 const app = express()
 
