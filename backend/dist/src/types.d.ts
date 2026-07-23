@@ -10,6 +10,7 @@ export declare const taskBody: z.ZodObject<{
     title: z.ZodString;
     description: z.ZodDefault<z.ZodString>;
     options: z.ZodArray<z.ZodObject<{
+        key: z.ZodString;
         optionId: z.ZodNumber;
         imageUrl: z.ZodString;
     }, z.z.core.$strip>>;

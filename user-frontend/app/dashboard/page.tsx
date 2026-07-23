@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import Taskdetail from "../components/Taskdetail";
 import { Suspense } from "react";
+import { BACKEND_URL } from "@/lib/config";
 
 export interface IOption {
   id: number,
@@ -17,7 +18,8 @@ export interface ITask {
   id: number,
   title: string,
   description: string,
-  done: boolean,
+  active: boolean,
+  createdAt : Date | string | number,
   options: IOption[]
 }
 
@@ -41,7 +43,7 @@ function DashboardContent() {
   useEffect(() => {
     if (taskId === null) return;
     async function getTask() {
-      const res = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/task/${taskId}`, {
+      const res = await axios.get(`${BACKEND_URL}/task/${taskId}`, {
         headers: {
           authorization: `Bearer ${localStorage.getItem('token')}`
         }
@@ -100,7 +102,7 @@ function DashboardContent() {
                       setTaskId(null);
                       setTask(null);
                     }}
-                    className="text-gray-600 hover:cursor-pointer">{"<"}
+                    className=" hover:cursor-pointer">{"<"}
                   </button>
                   <p>Poll Details</p>
                 </div> :

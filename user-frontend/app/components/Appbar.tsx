@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import bs58 from "bs58"
 import dynamic from "next/dynamic";
+import { BACKEND_URL } from "@/lib/config";
 
 const WalletMultiButton = dynamic(
   () => import('@solana/wallet-adapter-react-ui').then(m => m.WalletMultiButton),
@@ -29,7 +30,7 @@ export function Appbar(){
                 return
             }
             const signature = await signMessage(messageBytes)
-            const res = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/login`,{
+            const res = await axios.post(`${BACKEND_URL}/login`,{
                 address : publicKey?.toString(),
                 signature : bs58.encode(signature)
             })

@@ -92,8 +92,10 @@ export const TaskScalarFieldEnum = {
     id: 'id',
     title: 'title',
     description: 'description',
-    done: 'done',
-    userId: 'userId'
+    active: 'active',
+    userId: 'userId',
+    remaining_balance: 'remaining_balance',
+    createdAt: 'createdAt'
 };
 export const OptionScalarFieldEnum = {
     id: 'id',

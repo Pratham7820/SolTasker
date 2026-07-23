@@ -1,12 +1,13 @@
 "use client"
 
+import { BACKEND_URL } from "@/lib/config"
 import axios from "axios"
 import { useEffect, useState } from "react"
 
 interface Task{
     title : string,
     description : string,
-    done : boolean,
+    active : boolean,
     id : number
 }
 
@@ -17,20 +18,31 @@ export default function Tasks({taskfn} : {taskfn : (taskId : number)=> void}){
     useEffect(()=>{
         async function getAllTask(){
             setLoading(true)
-            const res = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/allTask`,{
-                headers : {
-                    'authorization' : `Bearer ${localStorage.getItem('token')}`
-                }
-            })
-            setTasks(res.data.tasks)
-            setLoading(false)
+            try {
+                const res = await axios.get(`${BACKEND_URL}/allTask`,{
+                    headers : {
+                        'authorization' : `Bearer ${localStorage.getItem('token')}`
+                    }
+                })
+                setTasks(res.data.tasks)
+            }catch (error){
+                console.log(error)
+            }finally{
+                setLoading(false)
+            }
         }
         getAllTask()
     },[])
 
     if(loading){
+        const arr = new Array(6).fill(0)
+        console.log('hit')
         return(
-            <div>Loading...</div>
+            <div className="grid grid-cols-3 gap-4">
+                {arr.map((_,index)=>(
+                    <div key={index} className ="h-64 border p-8 border-white/10 rounded-2xl animate-pulse bg-white/5"/>
+                ))}
+            </div>
         )
     }
 
@@ -45,7 +57,7 @@ export default function Tasks({taskfn} : {taskfn : (taskId : number)=> void}){
                             <div className="text-lg font-semibold">
                                 Task #{task.id}
                             </div>
-                            {task.done ? 
+                            {task.active ? 
                                 <div className="flex items-center gap-2 border px-2 rounded-full text-green-400">
                                    <p className="w-2 h-2 rounded-full bg-green-400"/>
                                     Active

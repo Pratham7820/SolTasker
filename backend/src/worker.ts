@@ -7,6 +7,7 @@ import nacl from "tweetnacl"
 import { Keypair, LAMPORTS_PER_SOL, PublicKey, SystemProgram, Transaction } from "@solana/web3.js"
 import bs58 from "bs58"
 import { connection } from "./index.js"
+import { DECIMAL_POINT, PARENT_SECRET_ADDRESS, PARENT_WALLET_ADDRESS, WORKER_JWT_SECRET } from "./config.js"
 
 const workerRouter = express.Router()
 const message = 'this is sign in message for worker'
@@ -48,7 +49,7 @@ workerRouter.post('/login',async (req,res)=>{
             }
         })
     }
-    const token = jwt.sign({workerId : worker.id},process.env.WORKER_JWT_SECRET || '')
+    const token = jwt.sign({workerId : worker.id},WORKER_JWT_SECRET)
     res.json({token})
 })
 
@@ -60,7 +61,8 @@ workerRouter.get('/nextTask',workerMiddleware,async (req:workerRequest,res)=>{
                 none : {
                     workerId : Number(workerId)
                 }
-            }
+            },
+            active : true
         },
         include : {
             options : true
@@ -89,10 +91,25 @@ workerRouter.post('/submission',workerMiddleware,async (req:workerRequest,res)=>
             where : {workerId : Number(workerId)},
             data : {
                 pending_amount : {
-                    increment : 0.01 * Number(process.env.DECIMAL_POINT || 100)
+                    increment : 0.01 * Number(DECIMAL_POINT)
                 }
             }
         })
+        const task_balance = await prisma.task.update({
+          where : {
+            id : Number(taskId)
+          },
+          data : {
+            remaining_balance : {
+              decrement : 0.01*Number(DECIMAL_POINT)
+            } 
+          }
+        })
+        if(task_balance.remaining_balance === 0){
+          await prisma.task.update({
+            where : {id : Number(taskId)},data : {active : false}
+          })
+        }
         return res.json({payment , submission})
     }
     res.json({
@@ -108,7 +125,7 @@ workerRouter.get("/balance",workerMiddleware,async (req:workerRequest,res)=>{
       }
     })
     return res.json({
-      balance : (balance?.pending_amount || 0)/Number(process.env.DECIMAL_POINT)
+      balance : (balance?.pending_amount || 0)/Number(DECIMAL_POINT)
     })
 })
 
@@ -130,7 +147,7 @@ workerRouter.get("/getPayment",workerMiddleware, async (req: workerRequest, res)
         });
       }
 
-      const threshold = 0.1 * Number(process.env.DECIMAL_POINT || 100)
+      const threshold = 0.1 * Number(DECIMAL_POINT)
 
       const claimed = await prisma.$queryRaw<{ amount: number }[]>`
         UPDATE "Balance"
@@ -141,7 +158,7 @@ workerRouter.get("/getPayment",workerMiddleware, async (req: workerRequest, res)
         RETURNING locked_amount AS amount`
 
       if (claimed.length === 0) {
-        return res.json({
+        return res.status(400).json({
           message: "not enough funds to withdraw",
         });
       }
@@ -152,16 +169,16 @@ workerRouter.get("/getPayment",workerMiddleware, async (req: workerRequest, res)
         const { blockhash , lastValidBlockHeight } = await connection.getLatestBlockhash();
 
         const transaction = new Transaction({
-          feePayer: new PublicKey(process.env.PARENT_WALLET_ADDRESS || ""),
+          feePayer: new PublicKey(PARENT_WALLET_ADDRESS),
           blockhash, lastValidBlockHeight}).add(
           SystemProgram.transfer({
-            fromPubkey: new PublicKey(process.env.PARENT_WALLET_ADDRESS || ""),
+            fromPubkey: new PublicKey(PARENT_WALLET_ADDRESS),
             toPubkey: new PublicKey(worker.address),
-            lamports: (amount || 0)/Number(process.env.DECIMAL_POINT || 100) * LAMPORTS_PER_SOL,
+            lamports: (amount || 0)/Number(DECIMAL_POINT) * LAMPORTS_PER_SOL,
           })
         )
 
-        const sender = Keypair.fromSecretKey(bs58.decode(process.env.PARENT_SECRET_ADDRESS || ""))
+        const sender = Keypair.fromSecretKey(bs58.decode(PARENT_SECRET_ADDRESS))
 
         const signature = await connection.sendTransaction(
           transaction,

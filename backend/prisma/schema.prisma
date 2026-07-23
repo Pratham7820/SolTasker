@@ -23,9 +23,11 @@ model Task {
   title String
   description String?
   options Option[]
-  done Boolean @default(false)
+  active Boolean @default(true)
   userId Int
+  remaining_balance Int @default(100)
   user User @relation(fields: [userId],references: [id])
+  createdAt DateTime @default(now())
   submissions Submission[]
 }
 
