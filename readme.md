@@ -2,7 +2,8 @@
 
 A decentralized feedback platform built on Solana, where users can post tasks/feedback requests and workers can complete them, with payments settled on-chain.
 
-🔗 **Live app:** [sol-tasker-five.vercel.app](https://sol-tasker-five.vercel.app)
+🔗 **Live app for user:** [sol-tasker-five.vercel.app](https://sol-tasker-five.vercel.app)
+🔗 **Live app for worker:** [sol-tasker-6ad9.vercel.app](https://sol-tasker-6ad9.vercel.app)
 
 ## Overview
 
