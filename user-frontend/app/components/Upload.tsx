@@ -1,4 +1,5 @@
 "use client";
+import { BACKEND_URL, CLOUDFRONT_URL, PARENT_WALLET } from "@/lib/config";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import {
   LAMPORTS_PER_SOL,
@@ -10,6 +11,7 @@ import axios from "axios";
 import { useCallback, useEffect, useState } from "react";
 
 interface imageType {
+  key : string,
   imageUrl: string;
   optionId: number;
 }
@@ -35,14 +37,14 @@ export function Upload({ publicKey }: { publicKey: string }) {
     if (!selected) return;
     async function uploadImage() {
       const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/getSignedUrl`,
+        `${BACKEND_URL}/getSignedUrl`,
         {
           headers: {
             authorization: `Bearer ${token}`,
           },
         },
       );
-      const url = res.data.url;
+      const { url , key } = res.data;
       const response = await axios.put(url, selected, {
         headers: {
           "Content-Type": "image/png",
@@ -52,7 +54,8 @@ export function Upload({ publicKey }: { publicKey: string }) {
       setImages((prev) => [
         ...prev,
         {
-          imageUrl: `${process.env.NEXT_PUBLIC_CLOUDFRONT_URL}/${res.data.key}`,
+          key : key,
+          imageUrl: `${CLOUDFRONT_URL}/${key}`,
           optionId: count,
         },
       ]);
@@ -70,7 +73,7 @@ export function Upload({ publicKey }: { publicKey: string }) {
         const transaction = new Transaction().add(
         SystemProgram.transfer({
             fromPubkey: new PublicKey(publicKey),
-            toPubkey: new PublicKey(process.env.NEXT_PUBLIC_PARENT_WALLET || ""),
+            toPubkey: new PublicKey(PARENT_WALLET || ""),
             lamports: 1 * LAMPORTS_PER_SOL,
         }),
         );
@@ -93,7 +96,7 @@ export function Upload({ publicKey }: { publicKey: string }) {
       alert("please pay first");
       return;
     }
-    const res = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/task`,{
+    const res = await axios.post(`${BACKEND_URL}/task`,{
         title,
         description,
         options: images,
@@ -112,6 +115,7 @@ export function Upload({ publicKey }: { publicKey: string }) {
     setDescription('')
     setCount(1)
     setImages([])
+    setPayment('')
     alert('Uploaded Successfully')
   }
 
@@ -132,7 +136,7 @@ export function Upload({ publicKey }: { publicKey: string }) {
 
             <input
               type="text"
-              defaultValue=""
+              value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Title"
               className="w-full bg-[#111827] text-white px-4 py-3 rounded-xl border border-violet-500/20 focus:outline-none focus:border-violet-500 placeholder:text-gray-500"
@@ -140,7 +144,7 @@ export function Upload({ publicKey }: { publicKey: string }) {
 
             <input
               type="text"
-              defaultValue=""
+              value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Description"
               className="w-full bg-[#111827] text-white px-4 py-3 rounded-xl border border-violet-500/20 focus:outline-none focus:border-violet-500 placeholder:text-gray-500"

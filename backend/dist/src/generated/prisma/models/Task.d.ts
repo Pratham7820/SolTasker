@@ -15,61 +15,77 @@ export type AggregateTask = {
 export type TaskAvgAggregateOutputType = {
     id: number | null;
     userId: number | null;
+    remaining_balance: number | null;
 };
 export type TaskSumAggregateOutputType = {
     id: number | null;
     userId: number | null;
+    remaining_balance: number | null;
 };
 export type TaskMinAggregateOutputType = {
     id: number | null;
     title: string | null;
     description: string | null;
-    done: boolean | null;
+    active: boolean | null;
     userId: number | null;
+    remaining_balance: number | null;
+    createdAt: Date | null;
 };
 export type TaskMaxAggregateOutputType = {
     id: number | null;
     title: string | null;
     description: string | null;
-    done: boolean | null;
+    active: boolean | null;
     userId: number | null;
+    remaining_balance: number | null;
+    createdAt: Date | null;
 };
 export type TaskCountAggregateOutputType = {
     id: number;
     title: number;
     description: number;
-    done: number;
+    active: number;
     userId: number;
+    remaining_balance: number;
+    createdAt: number;
     _all: number;
 };
 export type TaskAvgAggregateInputType = {
     id?: true;
     userId?: true;
+    remaining_balance?: true;
 };
 export type TaskSumAggregateInputType = {
     id?: true;
     userId?: true;
+    remaining_balance?: true;
 };
 export type TaskMinAggregateInputType = {
     id?: true;
     title?: true;
     description?: true;
-    done?: true;
+    active?: true;
     userId?: true;
+    remaining_balance?: true;
+    createdAt?: true;
 };
 export type TaskMaxAggregateInputType = {
     id?: true;
     title?: true;
     description?: true;
-    done?: true;
+    active?: true;
     userId?: true;
+    remaining_balance?: true;
+    createdAt?: true;
 };
 export type TaskCountAggregateInputType = {
     id?: true;
     title?: true;
     description?: true;
-    done?: true;
+    active?: true;
     userId?: true;
+    remaining_balance?: true;
+    createdAt?: true;
     _all?: true;
 };
 export type TaskAggregateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -152,8 +168,10 @@ export type TaskGroupByOutputType = {
     id: number;
     title: string;
     description: string | null;
-    done: boolean;
+    active: boolean;
     userId: number;
+    remaining_balance: number;
+    createdAt: Date;
     _count: TaskCountAggregateOutputType | null;
     _avg: TaskAvgAggregateOutputType | null;
     _sum: TaskSumAggregateOutputType | null;
@@ -170,8 +188,10 @@ export type TaskWhereInput = {
     id?: Prisma.IntFilter<"Task"> | number;
     title?: Prisma.StringFilter<"Task"> | string;
     description?: Prisma.StringNullableFilter<"Task"> | string | null;
-    done?: Prisma.BoolFilter<"Task"> | boolean;
+    active?: Prisma.BoolFilter<"Task"> | boolean;
     userId?: Prisma.IntFilter<"Task"> | number;
+    remaining_balance?: Prisma.IntFilter<"Task"> | number;
+    createdAt?: Prisma.DateTimeFilter<"Task"> | Date | string;
     options?: Prisma.OptionListRelationFilter;
     user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>;
     submissions?: Prisma.SubmissionListRelationFilter;
@@ -180,8 +200,10 @@ export type TaskOrderByWithRelationInput = {
     id?: Prisma.SortOrder;
     title?: Prisma.SortOrder;
     description?: Prisma.SortOrderInput | Prisma.SortOrder;
-    done?: Prisma.SortOrder;
+    active?: Prisma.SortOrder;
     userId?: Prisma.SortOrder;
+    remaining_balance?: Prisma.SortOrder;
+    createdAt?: Prisma.SortOrder;
     options?: Prisma.OptionOrderByRelationAggregateInput;
     user?: Prisma.UserOrderByWithRelationInput;
     submissions?: Prisma.SubmissionOrderByRelationAggregateInput;
@@ -193,8 +215,10 @@ export type TaskWhereUniqueInput = Prisma.AtLeast<{
     NOT?: Prisma.TaskWhereInput | Prisma.TaskWhereInput[];
     title?: Prisma.StringFilter<"Task"> | string;
     description?: Prisma.StringNullableFilter<"Task"> | string | null;
-    done?: Prisma.BoolFilter<"Task"> | boolean;
+    active?: Prisma.BoolFilter<"Task"> | boolean;
     userId?: Prisma.IntFilter<"Task"> | number;
+    remaining_balance?: Prisma.IntFilter<"Task"> | number;
+    createdAt?: Prisma.DateTimeFilter<"Task"> | Date | string;
     options?: Prisma.OptionListRelationFilter;
     user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>;
     submissions?: Prisma.SubmissionListRelationFilter;
@@ -203,8 +227,10 @@ export type TaskOrderByWithAggregationInput = {
     id?: Prisma.SortOrder;
     title?: Prisma.SortOrder;
     description?: Prisma.SortOrderInput | Prisma.SortOrder;
-    done?: Prisma.SortOrder;
+    active?: Prisma.SortOrder;
     userId?: Prisma.SortOrder;
+    remaining_balance?: Prisma.SortOrder;
+    createdAt?: Prisma.SortOrder;
     _count?: Prisma.TaskCountOrderByAggregateInput;
     _avg?: Prisma.TaskAvgOrderByAggregateInput;
     _max?: Prisma.TaskMaxOrderByAggregateInput;
@@ -218,13 +244,17 @@ export type TaskScalarWhereWithAggregatesInput = {
     id?: Prisma.IntWithAggregatesFilter<"Task"> | number;
     title?: Prisma.StringWithAggregatesFilter<"Task"> | string;
     description?: Prisma.StringNullableWithAggregatesFilter<"Task"> | string | null;
-    done?: Prisma.BoolWithAggregatesFilter<"Task"> | boolean;
+    active?: Prisma.BoolWithAggregatesFilter<"Task"> | boolean;
     userId?: Prisma.IntWithAggregatesFilter<"Task"> | number;
+    remaining_balance?: Prisma.IntWithAggregatesFilter<"Task"> | number;
+    createdAt?: Prisma.DateTimeWithAggregatesFilter<"Task"> | Date | string;
 };
 export type TaskCreateInput = {
     title: string;
     description?: string | null;
-    done?: boolean;
+    active?: boolean;
+    remaining_balance?: number;
+    createdAt?: Date | string;
     options?: Prisma.OptionCreateNestedManyWithoutTaskInput;
     user: Prisma.UserCreateNestedOneWithoutTaskInput;
     submissions?: Prisma.SubmissionCreateNestedManyWithoutTaskInput;
@@ -233,15 +263,19 @@ export type TaskUncheckedCreateInput = {
     id?: number;
     title: string;
     description?: string | null;
-    done?: boolean;
+    active?: boolean;
     userId: number;
+    remaining_balance?: number;
+    createdAt?: Date | string;
     options?: Prisma.OptionUncheckedCreateNestedManyWithoutTaskInput;
     submissions?: Prisma.SubmissionUncheckedCreateNestedManyWithoutTaskInput;
 };
 export type TaskUpdateInput = {
     title?: Prisma.StringFieldUpdateOperationsInput | string;
     description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
-    done?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    active?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    remaining_balance?: Prisma.IntFieldUpdateOperationsInput | number;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     options?: Prisma.OptionUpdateManyWithoutTaskNestedInput;
     user?: Prisma.UserUpdateOneRequiredWithoutTaskNestedInput;
     submissions?: Prisma.SubmissionUpdateManyWithoutTaskNestedInput;
@@ -250,8 +284,10 @@ export type TaskUncheckedUpdateInput = {
     id?: Prisma.IntFieldUpdateOperationsInput | number;
     title?: Prisma.StringFieldUpdateOperationsInput | string;
     description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
-    done?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    active?: Prisma.BoolFieldUpdateOperationsInput | boolean;
     userId?: Prisma.IntFieldUpdateOperationsInput | number;
+    remaining_balance?: Prisma.IntFieldUpdateOperationsInput | number;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     options?: Prisma.OptionUncheckedUpdateManyWithoutTaskNestedInput;
     submissions?: Prisma.SubmissionUncheckedUpdateManyWithoutTaskNestedInput;
 };
@@ -259,20 +295,26 @@ export type TaskCreateManyInput = {
     id?: number;
     title: string;
     description?: string | null;
-    done?: boolean;
+    active?: boolean;
     userId: number;
+    remaining_balance?: number;
+    createdAt?: Date | string;
 };
 export type TaskUpdateManyMutationInput = {
     title?: Prisma.StringFieldUpdateOperationsInput | string;
     description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
-    done?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    active?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    remaining_balance?: Prisma.IntFieldUpdateOperationsInput | number;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
 };
 export type TaskUncheckedUpdateManyInput = {
     id?: Prisma.IntFieldUpdateOperationsInput | number;
     title?: Prisma.StringFieldUpdateOperationsInput | string;
     description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
-    done?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    active?: Prisma.BoolFieldUpdateOperationsInput | boolean;
     userId?: Prisma.IntFieldUpdateOperationsInput | number;
+    remaining_balance?: Prisma.IntFieldUpdateOperationsInput | number;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
 };
 export type TaskListRelationFilter = {
     every?: Prisma.TaskWhereInput;
@@ -286,30 +328,38 @@ export type TaskCountOrderByAggregateInput = {
     id?: Prisma.SortOrder;
     title?: Prisma.SortOrder;
     description?: Prisma.SortOrder;
-    done?: Prisma.SortOrder;
+    active?: Prisma.SortOrder;
     userId?: Prisma.SortOrder;
+    remaining_balance?: Prisma.SortOrder;
+    createdAt?: Prisma.SortOrder;
 };
 export type TaskAvgOrderByAggregateInput = {
     id?: Prisma.SortOrder;
     userId?: Prisma.SortOrder;
+    remaining_balance?: Prisma.SortOrder;
 };
 export type TaskMaxOrderByAggregateInput = {
     id?: Prisma.SortOrder;
     title?: Prisma.SortOrder;
     description?: Prisma.SortOrder;
-    done?: Prisma.SortOrder;
+    active?: Prisma.SortOrder;
     userId?: Prisma.SortOrder;
+    remaining_balance?: Prisma.SortOrder;
+    createdAt?: Prisma.SortOrder;
 };
 export type TaskMinOrderByAggregateInput = {
     id?: Prisma.SortOrder;
     title?: Prisma.SortOrder;
     description?: Prisma.SortOrder;
-    done?: Prisma.SortOrder;
+    active?: Prisma.SortOrder;
     userId?: Prisma.SortOrder;
+    remaining_balance?: Prisma.SortOrder;
+    createdAt?: Prisma.SortOrder;
 };
 export type TaskSumOrderByAggregateInput = {
     id?: Prisma.SortOrder;
     userId?: Prisma.SortOrder;
+    remaining_balance?: Prisma.SortOrder;
 };
 export type TaskScalarRelationFilter = {
     is?: Prisma.TaskWhereInput;
@@ -359,6 +409,9 @@ export type NullableStringFieldUpdateOperationsInput = {
 export type BoolFieldUpdateOperationsInput = {
     set?: boolean;
 };
+export type DateTimeFieldUpdateOperationsInput = {
+    set?: Date | string;
+};
 export type TaskCreateNestedOneWithoutOptionsInput = {
     create?: Prisma.XOR<Prisma.TaskCreateWithoutOptionsInput, Prisma.TaskUncheckedCreateWithoutOptionsInput>;
     connectOrCreate?: Prisma.TaskCreateOrConnectWithoutOptionsInput;
@@ -386,7 +439,9 @@ export type TaskUpdateOneRequiredWithoutSubmissionsNestedInput = {
 export type TaskCreateWithoutUserInput = {
     title: string;
     description?: string | null;
-    done?: boolean;
+    active?: boolean;
+    remaining_balance?: number;
+    createdAt?: Date | string;
     options?: Prisma.OptionCreateNestedManyWithoutTaskInput;
     submissions?: Prisma.SubmissionCreateNestedManyWithoutTaskInput;
 };
@@ -394,7 +449,9 @@ export type TaskUncheckedCreateWithoutUserInput = {
     id?: number;
     title: string;
     description?: string | null;
-    done?: boolean;
+    active?: boolean;
+    remaining_balance?: number;
+    createdAt?: Date | string;
     options?: Prisma.OptionUncheckedCreateNestedManyWithoutTaskInput;
     submissions?: Prisma.SubmissionUncheckedCreateNestedManyWithoutTaskInput;
 };
@@ -426,13 +483,17 @@ export type TaskScalarWhereInput = {
     id?: Prisma.IntFilter<"Task"> | number;
     title?: Prisma.StringFilter<"Task"> | string;
     description?: Prisma.StringNullableFilter<"Task"> | string | null;
-    done?: Prisma.BoolFilter<"Task"> | boolean;
+    active?: Prisma.BoolFilter<"Task"> | boolean;
     userId?: Prisma.IntFilter<"Task"> | number;
+    remaining_balance?: Prisma.IntFilter<"Task"> | number;
+    createdAt?: Prisma.DateTimeFilter<"Task"> | Date | string;
 };
 export type TaskCreateWithoutOptionsInput = {
     title: string;
     description?: string | null;
-    done?: boolean;
+    active?: boolean;
+    remaining_balance?: number;
+    createdAt?: Date | string;
     user: Prisma.UserCreateNestedOneWithoutTaskInput;
     submissions?: Prisma.SubmissionCreateNestedManyWithoutTaskInput;
 };
@@ -440,8 +501,10 @@ export type TaskUncheckedCreateWithoutOptionsInput = {
     id?: number;
     title: string;
     description?: string | null;
-    done?: boolean;
+    active?: boolean;
     userId: number;
+    remaining_balance?: number;
+    createdAt?: Date | string;
     submissions?: Prisma.SubmissionUncheckedCreateNestedManyWithoutTaskInput;
 };
 export type TaskCreateOrConnectWithoutOptionsInput = {
@@ -460,7 +523,9 @@ export type TaskUpdateToOneWithWhereWithoutOptionsInput = {
 export type TaskUpdateWithoutOptionsInput = {
     title?: Prisma.StringFieldUpdateOperationsInput | string;
     description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
-    done?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    active?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    remaining_balance?: Prisma.IntFieldUpdateOperationsInput | number;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     user?: Prisma.UserUpdateOneRequiredWithoutTaskNestedInput;
     submissions?: Prisma.SubmissionUpdateManyWithoutTaskNestedInput;
 };
@@ -468,14 +533,18 @@ export type TaskUncheckedUpdateWithoutOptionsInput = {
     id?: Prisma.IntFieldUpdateOperationsInput | number;
     title?: Prisma.StringFieldUpdateOperationsInput | string;
     description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
-    done?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    active?: Prisma.BoolFieldUpdateOperationsInput | boolean;
     userId?: Prisma.IntFieldUpdateOperationsInput | number;
+    remaining_balance?: Prisma.IntFieldUpdateOperationsInput | number;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     submissions?: Prisma.SubmissionUncheckedUpdateManyWithoutTaskNestedInput;
 };
 export type TaskCreateWithoutSubmissionsInput = {
     title: string;
     description?: string | null;
-    done?: boolean;
+    active?: boolean;
+    remaining_balance?: number;
+    createdAt?: Date | string;
     options?: Prisma.OptionCreateNestedManyWithoutTaskInput;
     user: Prisma.UserCreateNestedOneWithoutTaskInput;
 };
@@ -483,8 +552,10 @@ export type TaskUncheckedCreateWithoutSubmissionsInput = {
     id?: number;
     title: string;
     description?: string | null;
-    done?: boolean;
+    active?: boolean;
     userId: number;
+    remaining_balance?: number;
+    createdAt?: Date | string;
     options?: Prisma.OptionUncheckedCreateNestedManyWithoutTaskInput;
 };
 export type TaskCreateOrConnectWithoutSubmissionsInput = {
@@ -503,7 +574,9 @@ export type TaskUpdateToOneWithWhereWithoutSubmissionsInput = {
 export type TaskUpdateWithoutSubmissionsInput = {
     title?: Prisma.StringFieldUpdateOperationsInput | string;
     description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
-    done?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    active?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    remaining_balance?: Prisma.IntFieldUpdateOperationsInput | number;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     options?: Prisma.OptionUpdateManyWithoutTaskNestedInput;
     user?: Prisma.UserUpdateOneRequiredWithoutTaskNestedInput;
 };
@@ -511,20 +584,26 @@ export type TaskUncheckedUpdateWithoutSubmissionsInput = {
     id?: Prisma.IntFieldUpdateOperationsInput | number;
     title?: Prisma.StringFieldUpdateOperationsInput | string;
     description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
-    done?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    active?: Prisma.BoolFieldUpdateOperationsInput | boolean;
     userId?: Prisma.IntFieldUpdateOperationsInput | number;
+    remaining_balance?: Prisma.IntFieldUpdateOperationsInput | number;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     options?: Prisma.OptionUncheckedUpdateManyWithoutTaskNestedInput;
 };
 export type TaskCreateManyUserInput = {
     id?: number;
     title: string;
     description?: string | null;
-    done?: boolean;
+    active?: boolean;
+    remaining_balance?: number;
+    createdAt?: Date | string;
 };
 export type TaskUpdateWithoutUserInput = {
     title?: Prisma.StringFieldUpdateOperationsInput | string;
     description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
-    done?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    active?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    remaining_balance?: Prisma.IntFieldUpdateOperationsInput | number;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     options?: Prisma.OptionUpdateManyWithoutTaskNestedInput;
     submissions?: Prisma.SubmissionUpdateManyWithoutTaskNestedInput;
 };
@@ -532,7 +611,9 @@ export type TaskUncheckedUpdateWithoutUserInput = {
     id?: Prisma.IntFieldUpdateOperationsInput | number;
     title?: Prisma.StringFieldUpdateOperationsInput | string;
     description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
-    done?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    active?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    remaining_balance?: Prisma.IntFieldUpdateOperationsInput | number;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     options?: Prisma.OptionUncheckedUpdateManyWithoutTaskNestedInput;
     submissions?: Prisma.SubmissionUncheckedUpdateManyWithoutTaskNestedInput;
 };
@@ -540,7 +621,9 @@ export type TaskUncheckedUpdateManyWithoutUserInput = {
     id?: Prisma.IntFieldUpdateOperationsInput | number;
     title?: Prisma.StringFieldUpdateOperationsInput | string;
     description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
-    done?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    active?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    remaining_balance?: Prisma.IntFieldUpdateOperationsInput | number;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
 };
 /**
  * Count Type TaskCountOutputType
@@ -578,8 +661,10 @@ export type TaskSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
     id?: boolean;
     title?: boolean;
     description?: boolean;
-    done?: boolean;
+    active?: boolean;
     userId?: boolean;
+    remaining_balance?: boolean;
+    createdAt?: boolean;
     options?: boolean | Prisma.Task$optionsArgs<ExtArgs>;
     user?: boolean | Prisma.UserDefaultArgs<ExtArgs>;
     submissions?: boolean | Prisma.Task$submissionsArgs<ExtArgs>;
@@ -589,26 +674,32 @@ export type TaskSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
     id?: boolean;
     title?: boolean;
     description?: boolean;
-    done?: boolean;
+    active?: boolean;
     userId?: boolean;
+    remaining_balance?: boolean;
+    createdAt?: boolean;
     user?: boolean | Prisma.UserDefaultArgs<ExtArgs>;
 }, ExtArgs["result"]["task"]>;
 export type TaskSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
     id?: boolean;
     title?: boolean;
     description?: boolean;
-    done?: boolean;
+    active?: boolean;
     userId?: boolean;
+    remaining_balance?: boolean;
+    createdAt?: boolean;
     user?: boolean | Prisma.UserDefaultArgs<ExtArgs>;
 }, ExtArgs["result"]["task"]>;
 export type TaskSelectScalar = {
     id?: boolean;
     title?: boolean;
     description?: boolean;
-    done?: boolean;
+    active?: boolean;
     userId?: boolean;
+    remaining_balance?: boolean;
+    createdAt?: boolean;
 };
-export type TaskOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "description" | "done" | "userId", ExtArgs["result"]["task"]>;
+export type TaskOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "description" | "active" | "userId" | "remaining_balance" | "createdAt", ExtArgs["result"]["task"]>;
 export type TaskInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     options?: boolean | Prisma.Task$optionsArgs<ExtArgs>;
     user?: boolean | Prisma.UserDefaultArgs<ExtArgs>;
@@ -632,8 +723,10 @@ export type $TaskPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
         id: number;
         title: string;
         description: string | null;
-        done: boolean;
+        active: boolean;
         userId: number;
+        remaining_balance: number;
+        createdAt: Date;
     }, ExtArgs["result"]["task"]>;
     composites: {};
 };
@@ -994,8 +1087,10 @@ export interface TaskFieldRefs {
     readonly id: Prisma.FieldRef<"Task", 'Int'>;
     readonly title: Prisma.FieldRef<"Task", 'String'>;
     readonly description: Prisma.FieldRef<"Task", 'String'>;
-    readonly done: Prisma.FieldRef<"Task", 'Boolean'>;
+    readonly active: Prisma.FieldRef<"Task", 'Boolean'>;
     readonly userId: Prisma.FieldRef<"Task", 'Int'>;
+    readonly remaining_balance: Prisma.FieldRef<"Task", 'Int'>;
+    readonly createdAt: Prisma.FieldRef<"Task", 'DateTime'>;
 }
 /**
  * Task findUnique

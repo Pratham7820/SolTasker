@@ -1,6 +1,7 @@
 import type { Response , NextFunction } from "express";
 import jwt, { type JwtPayload } from "jsonwebtoken"
 import type { userRequest, workerRequest } from "./types.js";
+import { USER_JWT_SECRET, WORKER_JWT_SECRET } from "./config.js";
 
 export function userMiddleware(req:userRequest,res:Response,next : NextFunction){
     const authToken = req.headers.authorization
@@ -16,7 +17,7 @@ export function userMiddleware(req:userRequest,res:Response,next : NextFunction)
         })
     }
     try {
-        const decoded = jwt.verify(token,process.env.USER_JWT_SECRET || '')
+        const decoded = jwt.verify(token,USER_JWT_SECRET)
         req.userId = (decoded as JwtPayload).userId
         next()
     } catch (error) {
@@ -41,7 +42,7 @@ export function workerMiddleware(req:workerRequest,res:Response,next:NextFunctio
         })
     }
     try {
-        const decoded = jwt.verify(token,process.env.WORKER_JWT_SECRET || '')
+        const decoded = jwt.verify(token,WORKER_JWT_SECRET)
         req.workerId = (decoded as JwtPayload).workerId
         next()
     } catch (error) {

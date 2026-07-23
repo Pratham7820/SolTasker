@@ -427,9 +427,6 @@ export type SubmissionUncheckedUpdateManyWithoutWorkerNestedInput = {
     updateMany?: Prisma.SubmissionUpdateManyWithWhereWithoutWorkerInput | Prisma.SubmissionUpdateManyWithWhereWithoutWorkerInput[];
     deleteMany?: Prisma.SubmissionScalarWhereInput | Prisma.SubmissionScalarWhereInput[];
 };
-export type DateTimeFieldUpdateOperationsInput = {
-    set?: Date | string;
-};
 export type SubmissionCreateWithoutTaskInput = {
     date?: Date | string;
     worker: Prisma.WorkerCreateNestedOneWithoutSubmissionInput;

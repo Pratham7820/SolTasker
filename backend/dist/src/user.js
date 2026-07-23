@@ -1,21 +1,20 @@
 import express from "express";
 import { prisma } from "./db.js";
 import jwt from "jsonwebtoken";
-import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { CopyObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { userMiddleware } from "./middleware.js";
 import { taskBody } from "./types.js";
-import { error } from "node:console";
 import nacl from "tweetnacl";
 import { PublicKey } from "@solana/web3.js";
 import bs58 from "bs58";
 import { connection } from "./index.js";
-import { map } from "zod";
+import { CLOUDFRONT_URL, S3_ACCESS_ID, S3_BUCKET, S3_SECRET_KEY, USER_JWT_SECRET } from "./config.js";
 const userRouter = express.Router();
 const client = new S3Client({
     credentials: {
-        accessKeyId: process.env.S3_ACCESS_ID || '',
-        secretAccessKey: process.env.S3_SECRET_KEY || ''
+        accessKeyId: S3_ACCESS_ID,
+        secretAccessKey: S3_SECRET_KEY
     },
     region: "ap-south-1"
 });
@@ -50,14 +49,14 @@ userRouter.post('/login', async (req, res) => {
             }
         });
     }
-    const token = jwt.sign({ userId: user.id }, process.env.USER_JWT_SECRET || '');
+    const token = jwt.sign({ userId: user.id }, USER_JWT_SECRET);
     return res.json({ token });
 });
 userRouter.get('/getSignedUrl', userMiddleware, async (req, res) => {
     const userId = req.userId;
-    const key = `user/${userId}/${Date.now()}`;
+    const key = `temp/${userId}/${Date.now()}`;
     const command = new PutObjectCommand({
-        Bucket: process.env.S3_BUCKET || '',
+        Bucket: S3_BUCKET,
         Key: key,
         ContentType: 'image/png'
     });
@@ -99,17 +98,27 @@ userRouter.post('/task', userMiddleware, async (req, res) => {
                     userId: Number(userId)
                 }
             });
-            for (const option of options) {
+            const permOptions = await Promise.all(options.map(async (e) => {
+                const key = `user/${userId}/${task.id}/${e.optionId}`;
+                const command = new CopyObjectCommand({
+                    Bucket: S3_BUCKET,
+                    CopySource: `${S3_BUCKET}/${e.key}`,
+                    Key: key
+                });
+                await client.send(command);
+                return { ...e, optionId: `${e.optionId}`, imageUrl: `${CLOUDFRONT_URL}/${key}` };
+            }));
+            await Promise.all(permOptions.map(async (option) => {
                 await tx.option.create({
                     data: {
-                        optionId: option.optionId,
+                        optionId: Number(option.optionId),
                         imageUrl: option.imageUrl,
                         taskId: task.id
                     }
                 });
-            }
+            }));
             return task;
-        });
+        }, { timeout: 15000, maxWait: 10000 });
         res.json({ response });
     }
     catch (err) {
@@ -145,16 +154,17 @@ userRouter.get('/task/:taskId', userMiddleware, async (req, res) => {
         },
         include: { option: true }
     });
-    const cnt = new Map();
+    const arr = new Array(task.options.length).fill(0);
     submissions.forEach((sub) => {
-        if (!cnt.has(sub.option.optionId)) {
-            cnt.set(sub.option.optionId, 1);
-        }
-        else {
-            cnt.set(sub.option.optionId, cnt.get(sub.option.optionId) + 1);
+        const index = sub.option.optionId - 1;
+        if (index >= 0 && index < arr.length) {
+            arr[index] += 1;
         }
     });
-    const votes = Object.fromEntries(cnt);
+    const votes = {};
+    task.options.forEach((opt, index) => {
+        votes[opt.optionId] = arr[index];
+    });
     res.json({ task, votes });
 });
 userRouter.get('/allTask', userMiddleware, async (req, res) => {

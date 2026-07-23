@@ -68,8 +68,14 @@ export default function Dashboard() {
       getBalance(userToken)
       alert('withdrawal successfully')
     }catch(err){
-      console.log(err)
-      alert('error while transaction')
+      if(axios.isAxiosError(err)){
+        const msg = err.response?.data.message
+        alert(msg)        
+      }
+      else {
+        alert('some error occurred')
+        console.log(err)
+      }
     }finally{
       setProcessing(false)
     }

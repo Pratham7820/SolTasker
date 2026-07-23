@@ -740,8 +740,10 @@ export declare const TaskScalarFieldEnum: {
     readonly id: "id";
     readonly title: "title";
     readonly description: "description";
-    readonly done: "done";
+    readonly active: "active";
     readonly userId: "userId";
+    readonly remaining_balance: "remaining_balance";
+    readonly createdAt: "createdAt";
 };
 export type TaskScalarFieldEnum = (typeof TaskScalarFieldEnum)[keyof typeof TaskScalarFieldEnum];
 export declare const OptionScalarFieldEnum: {

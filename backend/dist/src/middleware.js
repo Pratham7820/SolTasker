@@ -1,4 +1,5 @@
 import jwt, {} from "jsonwebtoken";
+import { USER_JWT_SECRET, WORKER_JWT_SECRET } from "./config.js";
 export function userMiddleware(req, res, next) {
     const authToken = req.headers.authorization;
     if (!authToken || !authToken.startsWith('Bearer ')) {
@@ -13,7 +14,7 @@ export function userMiddleware(req, res, next) {
         });
     }
     try {
-        const decoded = jwt.verify(token, process.env.USER_JWT_SECRET || '');
+        const decoded = jwt.verify(token, USER_JWT_SECRET);
         req.userId = decoded.userId;
         next();
     }
@@ -38,7 +39,7 @@ export function workerMiddleware(req, res, next) {
         });
     }
     try {
-        const decoded = jwt.verify(token, process.env.WORKER_JWT_SECRET || '');
+        const decoded = jwt.verify(token, WORKER_JWT_SECRET);
         req.workerId = decoded.workerId;
         next();
     }
